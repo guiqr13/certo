@@ -354,11 +354,26 @@
                            `💰 Valor total: R$ ${valor.toFixed(2)}\n\n` +
                            `Por favor, me confirme a reserva destes números!`;
             
-            // Mostrar mensagem para contato
-            alert(`🎯 NÚMEROS SELECIONADOS!\n\nNúmeros: ${numeros}\nValor: R$ ${valor.toFixed(2)}\n\n📱 PRÓXIMO PASSO:\nEntre em contato pelo WhatsApp (64) 9 9292-4042 com esta mensagem:\n\n"${mensagem}"\n\n⚠️ Os números só serão reservados após confirmação do pagamento!`);
+            // Codificar mensagem para URL do WhatsApp
+            const mensagemCodificada = encodeURIComponent(mensagem);
+            const numeroWhatsApp = '5564992924042'; // Formato internacional: 55 + DDD + número
+            const linkWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensagemCodificada}`;
             
-            // Limpar seleção (números só são marcados como vendidos após confirmação pelo responsável)
-            limparSelecao();
+            // Confirmar antes de abrir WhatsApp
+            const confirmacao = confirm(`🎯 CONFIRMAR COMPRA\n\nNúmeros: ${numeros}\nValor: R$ ${valor.toFixed(2)}\n\n✅ Clique OK para abrir o WhatsApp e enviar a mensagem automaticamente!`);
+            
+            if (confirmacao) {
+                // Abrir WhatsApp com mensagem pré-preenchida
+                window.open(linkWhatsApp, '_blank');
+                
+                // Limpar seleção
+                limparSelecao();
+                
+                // Mostrar instruções
+                setTimeout(() => {
+                    alert(`📱 WhatsApp aberto!\n\n✅ A mensagem já está digitada\n✅ Apenas clique em ENVIAR\n✅ Aguarde a confirmação do Guilherme\n\n⚠️ Os números só serão reservados após confirmação do pagamento!`);
+                }, 1000);
+            }
         }
         
         // Função para o responsável marcar números como vendidos (seria usada pelo admin)
