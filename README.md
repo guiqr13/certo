@@ -242,6 +242,7 @@
             <p style="font-size: 0.9em; font-style: italic;">
                 ✅ 100% do valor arrecadado será destinado ao tratamento<br>
                 ✅ Prêmio doado pelos organizadores<br>
+                ✅ Números só são reservados após confirmação do pagamento<br>
                 ✅ Comprovantes de todas as transações serão disponibilizados
             </p>
         </div>
@@ -249,7 +250,7 @@
 
     <script>
         let numerosSelecionados = [];
-        let numerosVendidos = new Set(); // Simula números já vendidos
+        let numerosVendidos = new Set(); // Inicia vazio - sem números pré-vendidos
         
         // Gerar grid de números
         function gerarNumeros() {
@@ -353,28 +354,65 @@
                            `💰 Valor total: R$ ${valor.toFixed(2)}\n\n` +
                            `Por favor, me confirme a reserva destes números!`;
             
-            // Simular venda (em um sistema real, isso seria enviado ao servidor)
-            const confirmacao = confirm(`🎯 CONFIRMAR COMPRA\n\nNúmeros: ${numeros}\nValor: R$ ${valor.toFixed(2)}\n\nDeseja prosseguir?`);
+            // Mostrar mensagem para contato
+            alert(`🎯 NÚMEROS SELECIONADOS!\n\nNúmeros: ${numeros}\nValor: R$ ${valor.toFixed(2)}\n\n📱 PRÓXIMO PASSO:\nEntre em contato pelo WhatsApp (64) 9 9292-4042 com esta mensagem:\n\n"${mensagem}"\n\n⚠️ Os números só serão reservados após confirmação do pagamento!`);
             
-            if (confirmacao) {
-                // Marcar números como vendidos
-                numerosSelecionados.forEach(num => numerosVendidos.add(num));
-                limparSelecao();
-                gerarNumeros(); // Regenerar grid
-                atualizarInfo();
-                
-                alert(`✅ Números reservados com sucesso!\n\nEntre em contato pelo WhatsApp para finalizar o pagamento.\n\nMensagem sugerida:\n"${mensagem}"`);
+            // Limpar seleção (números só são marcados como vendidos após confirmação pelo responsável)
+            limparSelecao();
+        }
+        
+        // Função para o responsável marcar números como vendidos (seria usada pelo admin)
+        function marcarComoVendido(numerosArray) {
+            numerosArray.forEach(num => {
+                numerosVendidos.add(parseInt(num));
+                salvarNumeroVendido(parseInt(num));
+            });
+            gerarNumeros();
+            atualizarInfo();
+        }
+        
+        // Função para administração (seria protegida por senha em sistema real)
+        function adminPanel() {
+            const senha = prompt('🔐 Digite a senha de administrador:');
+            if (senha === 'admin123') { // Em sistema real, seria hash seguro
+                const numerosVender = prompt('📝 Digite os números vendidos separados por vírgula (ex: 1,5,10):');
+                if (numerosVender) {
+                    const numerosArray = numerosVender.split(',').map(n => n.trim());
+                    marcarComoVendido(numerosArray);
+                    alert('✅ Números marcados como vendidos!');
+                }
+            } else if (senha !== null) {
+                alert('❌ Senha incorreta!');
             }
         }
         
-        // Simular alguns números já vendidos (para demonstração)
-        function simularVendas() {
-            const numerosSimulados = [7, 13, 21, 33, 42, 55, 69, 77, 88, 99];
-            numerosSimulados.forEach(num => numerosVendidos.add(num));
+        // Adicionar duplo clique para acessar painel admin (escondido)
+        document.addEventListener('dblclick', function(e) {
+            if (e.ctrlKey) { // Ctrl + duplo clique
+                adminPanel();
+            }
+        });
+        
+        // Sistema de persistência em memória
+        function carregarNumerosVendidos() {
+            // Inicia sempre vazio - todos os números disponíveis
+            numerosVendidos = new Set();
+        }
+        
+        function salvarNumeroVendido(numero) {
+            // Em um sistema real, isso salvaria no banco de dados
+            // Por enquanto, mantém apenas na sessão
+            numerosVendidos.add(numero);
+            localStorage.setItem('numerosVendidos', JSON.stringify([...numerosVendidos]));
+        }
+        
+        function carregarDados() {
+            // Sempre inicia com todos os números disponíveis
+            numerosVendidos = new Set();
         }
         
         // Inicializar
-        simularVendas();
+        carregarDados();
         gerarNumeros();
         atualizarInfo();
     </script>
